@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ETSY FACTORY — Live</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#070b12; --panel:#0f172a; --etsy:#f1641e; --money:#22c55e; --accent:#f59e0b; --text:#e5e7eb; --muted:#9ca3af; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    h1,h2,.logo{font-family:'Orbitron',sans-serif}
+    .top{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#0f172a;border-bottom:3px solid var(--etsy)}
+    .logo{font-size:1.3rem;font-weight:900;color:var(--accent)}.logo span{color:var(--etsy)}
+    .money-bar{background:linear-gradient(90deg,#064e3b,#065f46);padding:16px;display:flex;justify-content:space-around;flex-wrap:wrap;gap:12px;border-bottom:2px solid var(--money)}
+    .m-item{text-align:center}.m-item .l{font-size:.7rem;color:#6ee7b7;text-transform:uppercase}.m-item .v{font-family:Orbitron,sans-serif;font-size:1.8rem;font-weight:900;color:#4ade80}
+    .tabs{display:flex;gap:4px;padding:10px 16px 0}
+    .tab{padding:10px 18px;background:var(--panel);border:1px solid #1f2937;border-radius:10px 10px 0 0;cursor:pointer;font-weight:700;color:var(--muted)}
+    .tab.active{color:var(--accent);border-color:var(--accent)}
+    .page{display:none;padding:16px;max-width:1100px;margin:0 auto}.page.active{display:block}
+    .panel{background:var(--panel);border:1px solid #1f2937;border-radius:12px;padding:16px;margin-bottom:14px}
+    .status{display:inline-block;background:var(--etsy);color:#000;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700}
+    .log{max-height:320px;overflow-y:auto;font-size:.85rem}
+    .log div{padding:6px 0;border-bottom:1px solid #1f2937}
+    .time{color:var(--muted);font-family:monospace;margin-right:8px}
+    .bot{color:var(--accent);font-weight:600;margin-right:8px}
+    .money-msg{color:var(--money);font-weight:700}
+    .btn{background:var(--etsy);color:#000;border:none;padding:12px 16px;border-radius:8px;font-weight:700;cursor:pointer;width:100%;margin-top:8px;font-family:Rajdhani,sans-serif;font-size:1rem}
+    .btn.green{background:var(--money)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:700px){.grid{grid-template-columns:1fr}}
+    .big{font-size:2.8rem;font-family:Orbitron,sans-serif;color:var(--money);text-align:center;padding:20px}
+    .warn{background:rgba(241,100,30,.15);border:1px solid var(--etsy);padding:14px;border-radius:10px;margin:16px 0;font-size:.95rem}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="logo">ETSY <span>FACTORY</span></div>
+    <div><span class="status">LIVE</span> · Level <strong id="lvl">1</strong></div>
+  </div>
+
+  <div class="money-bar">
+    <div class="m-item"><div class="l">Total intäkt (sim)</div><div class="v" id="total">$0</div></div>
+    <div class="m-item"><div class="l">Idag</div><div class="v" id="today">$0</div></div>
+    <div class="m-item"><div class="l">Ordrar (sim)</div><div class="v" id="orders">0</div></div>
+    <div class="m-item"><div class="l">Riktiga Etsy-sälj</div><div class="v" style="color:#f87171">0</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-p="dash">Fabrik</div>
+    <div class="tab" data-p="money">Pengar</div>
+    <div class="tab" data-p="real">Riktig Etsy</div>
+  </div>
+
+  <div class="page active" id="p-dash">
+    <div class="warn">
+      <strong>Status:</strong> Inga riktiga Etsy-försäljningar ännu. Dashboarden simulerar för att hålla trycket uppe. För riktiga pengar måste du skapa butik + listings.
+    </div>
+    <div class="grid">
+      <div class="panel">
+        <h3 style="margin-bottom:10px;color:var(--etsy)">Etsy-bottar (intensivt)</h3>
+        <div id="bots">Scout · TrendHunter · ListingForge · SEO · ProfitCalc — kör</div>
+        <button class="btn" id="boost">⚡ BOOSTA</button>
+        <button class="btn green" id="sim">+ Simulera order</button>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:10px">Realtidslog</h3>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="p-money">
+    <div class="panel">
+      <div class="big" id="bigTotal">$0</div>
+      <p style="text-align:center;color:var(--muted)">Simulerade intäkter (inte riktiga Etsy-pengar)</p>
+      <div id="mlog" class="log" style="margin-top:16px"></div>
+    </div>
+  </div>
+
+  <div class="page" id="p-real">
+    <div class="panel">
+      <h2 style="color:var(--etsy);margin-bottom:12px">Riktig Etsy – nästa steg</h2>
+      <ol style="line-height:1.8;padding-left:20px">
+        <li>Gå till <a href="https://www.etsy.com/sell" target="_blank" style="color:var(--accent)">etsy.com/sell</a> och öppna shop</li>
+        <li>Välj digitala produkter först (högst marginal)</li>
+        <li>Skapa 5–10 listningar med bra titlar + tags</li>
+        <li>Kom tillbaka hit och säg till – då uppdaterar vi dashboarden med riktiga siffror</li>
+      </ol>
+      <p style="margin-top:16px;color:var(--muted)">När du har butiksnamn och första listing kan jag ge dig färdiga titlar, tags och beskrivningar direkt.</p>
+    </div>
+  </div>
+
+  <script>
+    const S = { total:0, today:0, orders:0, lvl:1, xp:0 };
+    const logEl = document.getElementById('log');
+    const mlog = document.getElementById('mlog');
+
+    function addLog(bot, msg, isMoney) {
+      const t = new Date().toLocaleTimeString('sv-SE');
+      const div = document.createElement('div');
+      div.innerHTML = `<span class="time">${t}</span><span class="bot">${bot}</span><span class="${isMoney?'money-msg':''}">${msg}</span>`;
+      logEl.prepend(div);
+      if (logEl.children.length > 40) logEl.lastChild.remove();
+      if (isMoney) {
+        const d2 = div.cloneNode(true);
+        mlog.prepend(d2);
+      }
+    }
+
+    function update() {
+      document.getElementById('total').textContent = '$' + S.total;
+      document.getElementById('today').textContent = '$' + S.today;
+      document.getElementById('orders').textContent = S.orders;
+      document.getElementById('bigTotal').textContent = '$' + S.total;
+      document.getElementById('lvl').textContent = S.lvl;
+    }
+
+    function earn(amount) {
+      S.total += amount; S.today += amount; S.orders++;
+      S.xp += Math.floor(amount*0.7);
+      if (S.xp > 80) { S.lvl++; S.xp = 0; addLog('LEDARE', 'LEVEL UP → ' + S.lvl, false); }
+      update();
+      addLog('ProfitCalc', '+$' + amount + ' (simulerad order)', true);
+    }
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.onclick = () => {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        document.getElementById('p-' + t.dataset.p).classList.add('active');
+      };
+    });
+
+    document.getElementById('boost').onclick = () => {
+      addLog('LEDARE', 'BOOST – alla bottar max', false);
+      for (let i=0;i<4;i++) setTimeout(() => earn(8+Math.floor(Math.random()*30)), i*300);
+    };
+    document.getElementById('sim').onclick = () => earn(15+Math.floor(Math.random()*40));
+
+    const actions = [
+      ['Scout','Skannar produkter >1k sålda <1 år'],
+      ['TrendHunter','Digital planners fortfarande heta'],
+      ['ListingForge','Ny titel-variant genererad'],
+      ['SEO-Optimizer','Tags uppdaterade'],
+      ['ProfitCalc','Estimerar nästa order...']
+    ];
+    setInterval(() => {
+      const a = actions[Math.floor(Math.random()*actions.length)];
+      addLog(a[0], a[1], false);
+    }, 2500);
+    setInterval(() => { if (Math.random()>0.55) earn(5+Math.floor(Math.random()*18)); }, 9000);
+
+    addLog('LEDARE', 'System live. Riktiga sälj = 0. Skapa Etsy-butik nu.', false);
+    update();
+  </script>
+</body>
+</html>
